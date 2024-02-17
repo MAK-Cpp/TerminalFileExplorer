@@ -26,12 +26,14 @@ class Window {
      */
 private:
     WINDOW* window_;
+    WINDOW* sub_window_;
     Point p0_;
     Point p1_;
     std::string name_;
-
+    void print_border() const;
+    void print_content() const;
 public:
-    Window(int nlines, int ncols, int y0, int x0, std::string const& name = "");
+    Window(int nlines, int ncols, int y0, int x0, std::string  name = "");
     operator WINDOW*() const;
     void set_name(std::string const& name);
     WindowSide get_side(int x, int y);
@@ -43,6 +45,7 @@ public:
     int height() const;
     void print() const;
     void clear() const;
+    void refresh() const;
     void move_x0(int l);
     void move_y0(int l);
     void move_x1(int l);

@@ -3,37 +3,23 @@
 //
 
 #include "Window.h"
-Window::Window(int nlines, int ncols, int y0, int x0, std::string const& name)
-    : window_{newwin(nlines, ncols, y0, x0)}, p0_{x0, y0}, p1_{x0 + ncols - 1, y0 + nlines - 1}, name_{name} {}
+
+#include <utility>
+
+Window::Window(int nlines, int ncols, int y0, int x0, std::string name)
+    : window_{newwin(nlines, ncols, y0, x0)}
+    , p0_{x0, y0}
+    , p1_{x0 + ncols - 1, y0 + nlines - 1}
+    , name_{std::move(name)}
+    , sub_window_{subwin(window_, nlines - 2, ncols - 2, 1, 1)} {}
 Window::~Window() {
+    delwin(sub_window_);
     delwin(window_);
 }
 void Window::print() const {
-    const int name_size = name_.size() + 4; // name + 2 spaces + 2 brackets
-    const int name_start_pos = (width() - name_size + 1) / 2;
-    const int name_end_pos = name_start_pos + name_size - 1;
-    const std::string name_result = "[ " + name_ + " ]";
-    for (int i = 1; i < width() - 1; ++i) {
-        if (name_start_pos <= i && i <= name_end_pos) {
-            mvwaddch(window_, 0, i, name_result[i - name_start_pos]);
-        } else {
-            mvwaddch(window_, 0, i, '-');
-        }
-        mvwaddch(window_, height() - 1, i, '-');
-    }
-    for (int j = 1; j < height() - 1; ++j) {
-        mvwaddch(window_, j, 0, '|');
-        mvwaddch(window_, j, width() - 1, '|');
-    }
-    mvwaddch(window_, 0, 0, '*');
-    mvwaddch(window_, height() - 1, 0, '+');
-    mvwaddch(window_, 0, width() - 1, '+');
-    mvwaddch(window_, height() - 1, width() - 1, '*');
-    mvwprintw(window_, 1, 1, "p0 = (%03d; %03d)", p0_.x(), p0_.y());
-    mvwprintw(window_, height() - 2, width() - 1 - 15, "p1 = (%03d; %03d)", p1_.x(), p1_.y());
-    wmove(window_, 1, 1);
-    // box(window_, 0, 0);
-    wrefresh(window_);
+    print_content();
+    print_border();
+    refresh();
 }
 int Window::get_ch() const {
     return wgetch(window_);
@@ -104,5 +90,36 @@ Point const& Window::p1() const {
 }
 void Window::clear() const {
     wclear(window_);
+    wrefresh(window_);
+}
+void Window::print_content() const {
+    mvwprintw(sub_window_, 1, 1, "p0 = (%03d; %03d)", p0_.x(), p0_.y());
+    mvwprintw(sub_window_, 2, 1, "p1 = (%03d; %03d)", p1_.x(), p1_.y());
+}
+void Window::print_border() const {
+    const int name_size           = name_.size() + 4;  // name + 2 spaces + 2 brackets
+    const int name_start_pos      = (width() - name_size + 1) / 2;
+    const int name_end_pos        = name_start_pos + name_size - 1;
+    const std::string name_result = "[ " + name_ + " ]";
+    for (int i = 1; i < width() - 1; ++i) {
+        if (name_start_pos <= i && i <= name_end_pos) {
+            mvwaddch(window_, 0, i, name_result[i - name_start_pos]);
+        } else {
+            mvwaddch(window_, 0, i, '-');
+        }
+        mvwaddch(window_, height() - 1, i, '-');
+    }
+    for (int j = 1; j < height() - 1; ++j) {
+        mvwaddch(window_, j, 0, '|');
+        mvwaddch(window_, j, width() - 1, '|');
+    }
+    mvwaddch(window_, 0, 0, '*');
+    mvwaddch(window_, height() - 1, 0, '+');
+    mvwaddch(window_, 0, width() - 1, '+');
+    mvwaddch(window_, height() - 1, width() - 1, '*');
+    // box(window_, 0, 0);
+}
+void Window::refresh() const {
+    wrefresh(sub_window_);
     wrefresh(window_);
 }
