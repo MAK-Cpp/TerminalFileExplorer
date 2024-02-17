@@ -37,9 +37,12 @@ public:
     WindowSide get_side(int x, int y);
     [[nodiscard]] std::string name() const;
     [[nodiscard]] int get_ch() const;
+    [[nodiscard]] Point const& p0() const;
+    [[nodiscard]] Point const& p1() const;
     int width() const;
     int height() const;
     void print() const;
+    void clear() const;
     void move_x0(int l);
     void move_y0(int l);
     void move_x1(int l);

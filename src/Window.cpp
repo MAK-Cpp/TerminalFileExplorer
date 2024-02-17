@@ -25,10 +25,12 @@ void Window::print() const {
         mvwaddch(window_, j, 0, '|');
         mvwaddch(window_, j, width() - 1, '|');
     }
-    mvwaddch(window_, 0, 0, '+');
+    mvwaddch(window_, 0, 0, '*');
     mvwaddch(window_, height() - 1, 0, '+');
     mvwaddch(window_, 0, width() - 1, '+');
-    mvwaddch(window_, height() - 1, width() - 1, '+');
+    mvwaddch(window_, height() - 1, width() - 1, '*');
+    mvwprintw(window_, 1, 1, "p0 = (%03d; %03d)", p0_.x(), p0_.y());
+    mvwprintw(window_, height() - 2, width() - 1 - 15, "p1 = (%03d; %03d)", p1_.x(), p1_.y());
     wmove(window_, 1, 1);
     // box(window_, 0, 0);
     wrefresh(window_);
@@ -59,37 +61,31 @@ WindowSide Window::get_side(int x, int y) {
     return WindowSide::NONE;
 }
 void Window::move_x0(int l) {
-    wclear(window_);
-    wrefresh(window_);
+    clear();
     p0_.add_to_x(l);
-    mvwin(window_, p0_.y(), p0_.x());
     wresize(window_, height(), width());
+    mvwin(window_, p0_.y(), p0_.x());
     print();
     wrefresh(window_);
 }
 void Window::move_y0(int l) {
-    wclear(window_);
-    wrefresh(window_);
+    clear();
     p0_.add_to_y(l);
-    mvwin(window_, p0_.y(), p0_.x());
     wresize(window_, height(), width());
+    mvwin(window_, p0_.y(), p0_.x());
     print();
     wrefresh(window_);
 }
 void Window::move_x1(int l) {
-    wclear(window_);
-    wrefresh(window_);
+    clear();
     p1_.add_to_x(l);
-    mvwin(window_, p0_.y(), p0_.x());
     wresize(window_, height(), width());
     print();
     wrefresh(window_);
 }
 void Window::move_y1(int l) {
-    wclear(window_);
-    wrefresh(window_);
+    clear();
     p1_.add_to_y(l);
-    mvwin(window_, p0_.y(), p0_.x());
     wresize(window_, height(), width());
     print();
     wrefresh(window_);
@@ -99,4 +95,14 @@ int Window::width() const {
 }
 int Window::height() const {
     return p1_.y() - p0_.y() + 1;
+}
+Point const& Window::p0() const {
+    return p0_;
+}
+Point const& Window::p1() const {
+    return p1_;
+}
+void Window::clear() const {
+    wclear(window_);
+    wrefresh(window_);
 }

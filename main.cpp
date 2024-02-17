@@ -34,13 +34,13 @@ int main(int argc, char **argv) {
 
     // WINDOW *const win   = newwin(LINES, COLS - DEBUG_WIN_WIDTH, 0, 0);
     // WINDOW *const debug = newwin(6, DEBUG_WIN_WIDTH - 1, 0, COLS - DEBUG_WIN_WIDTH);
-    Window win(LINES - 6, COLS - DEBUG_WIN_WIDTH, 0, 0, "main window");
+    Window win(LINES, COLS - DEBUG_WIN_WIDTH, 0, 0, "main window");
     // Window win(3, 4, 0, 0);
-    Window debug(12, DEBUG_WIN_WIDTH / 1.5, 0, COLS - (DEBUG_WIN_WIDTH / 1.5), "DEBUG");
+    Window debug(12, DEBUG_WIN_WIDTH, 0, COLS - DEBUG_WIN_WIDTH, "DEBUG");
 
     Window windows[2] = {win, debug};
 
-    curs_set(0);  // hide cursor
+    // curs_set(0);  // hide cursor
     raw();        // disable line buffering
     noecho();
     mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, nullptr);
@@ -76,14 +76,14 @@ int main(int argc, char **argv) {
                         current_window = 1;
                     }
                     keypad(windows[current_window], TRUE);
-                } else if (event.bstate & BUTTON1_PRESSED) {
+                } else if ((event.bstate & BUTTON1_PRESSED) && !is_resizing) {
                     side = windows[current_window].get_side(event.x, event.y);
                     prev_mouse_x = event.x;
                     prev_mouse_y = event.y;
                     if (side != WindowSide::NONE) {
                         is_resizing = true;
                     }
-                } else if (event.bstate & BUTTON1_RELEASED) {
+                } else if ((event.bstate & BUTTON1_RELEASED) && is_resizing) {
                     if (is_resizing) {
                         is_resizing  = false;
                         side = WindowSide::NONE;
@@ -92,27 +92,32 @@ int main(int argc, char **argv) {
                     }
                 } else {
                     if (!is_resizing) {
-                        wclear(debug);
+                        debug.clear();
                         debug.print();
                     } else {
                         switch (side) {
                         case WindowSide::LEFT: {
+                            mvwprintw(debug, 4, 1, "left");
                             windows[current_window].move_x0(event.x - prev_mouse_x);
                             break;
                         }
                         case WindowSide::TOP: {
+                            mvwprintw(debug, 4, 1, "top");
                             windows[current_window].move_y0(event.y - prev_mouse_y);
                             break;
                         }
                         case WindowSide::RIGHT: {
+                            mvwprintw(debug, 4, 1, "right");
                             windows[current_window].move_x1(event.x - prev_mouse_x);
                             break;
                         }
                         case WindowSide::BOTTOM: {
+                            mvwprintw(debug, 4, 1, "bottom");
                             windows[current_window].move_y1(event.y - prev_mouse_y);
                             break;
                         }
                         case WindowSide::NONE: {
+                            mvwprintw(debug, 4, 1, "NONE");
                             break;
                         }
                         }
