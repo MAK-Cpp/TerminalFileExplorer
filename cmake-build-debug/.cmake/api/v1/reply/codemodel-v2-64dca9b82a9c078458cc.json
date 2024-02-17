@@ -1,0 +1,105 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.27"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "TerminalFileExplorer",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "Directory::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Directory-Debug-9475fdc6feefe331821a.json",
+					"name" : "Directory",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "File::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-File-Debug-e95cc7aa9cdd770bb93a.json",
+					"name" : "File",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Point::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Point-Debug-34961ea296a64b813e6e.json",
+					"name" : "Point",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "RasterLine::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-RasterLine-Debug-c064c8c800b45073dcc0.json",
+					"name" : "RasterLine",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "TerminalFileExplorer::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-TerminalFileExplorer-Debug-01a257a912e5672e83e6.json",
+					"name" : "TerminalFileExplorer",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Window::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Window-Debug-48d8225f0ce1bd9ac946.json",
+					"name" : "Window",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/maxim/study/c++/TerminalFileExplorer/cmake-build-debug",
+		"source" : "/Users/maxim/study/c++/TerminalFileExplorer"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}
