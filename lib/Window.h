@@ -32,6 +32,12 @@ private:
     std::string name_;
     void print_border() const;
     void print_content() const;
+
+    static inline int horizontal_border_width = 1;
+    static inline int vertical_border_width = 2;
+    static inline std::string horizontal_border = "=";
+    static inline std::string vertical_border = "||";
+    static inline std::string corner_border[] = {"[]"};
 public:
     Window(int nlines, int ncols, int y0, int x0, std::string  name = "");
     operator WINDOW*() const;
@@ -46,6 +52,7 @@ public:
     void print() const;
     void clear() const;
     void refresh() const;
+    void set_keypad(int value);
     void move_x0(int l);
     void move_y0(int l);
     void move_x1(int l);

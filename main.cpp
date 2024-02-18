@@ -27,7 +27,7 @@ std::function<bool(Point)> check_mouse_in_square(Point &&a, Point &&b) {
     return [a, b](Point x) -> bool { return a.x() <= x.x() && a.y() <= x.y() && b.x() >= x.x() && b.y() >= x.y(); };
 }
 
-constexpr int DEBUG_WIN_WIDTH = 50;
+const int DEBUG_WIN_WIDTH = 80;
 
 // void mouse_event(int ch, Window const windows[], int& current_window) {
 //
@@ -36,26 +36,26 @@ constexpr int DEBUG_WIN_WIDTH = 50;
 int main(int argc, char **argv) {
     initscr();
 
-    Window win(LINES, COLS - DEBUG_WIN_WIDTH, 0, 0, "main window");
     Window debug(LINES / 2, DEBUG_WIN_WIDTH, 0, COLS - DEBUG_WIN_WIDTH, "DEBUG");
+    Window win(LINES, COLS - DEBUG_WIN_WIDTH, 0, 0, "main window");
 
     Window windows[2] = {win, debug};
 
-    curs_set(0);  // hide cursor
+    // curs_set(0);  // hide cursor
     raw();        // disable line buffering
     noecho();
     mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, nullptr);
     printf("\033[?1003h\n");  // Makes the terminal report mouse movement events
     bool while_state = true;
     int ch;
-    debug.print();
     win.print();
+    debug.print();
 
     int current_window = 0;
-    keypad(windows[current_window], TRUE);
+    windows[current_window].set_keypad(TRUE);
 
-    mvwprintw(debug, 2, 1, "current_window window is %10s", windows[current_window].name().c_str());
-    wrefresh(debug);
+    // mvwprintw(debug, 2, 1, "current_window window is %10s", windows[current_window].name().c_str());
+    // debug.refresh();
 
     bool is_resizing = false;
     WindowSide side  = WindowSide::NONE;
@@ -70,13 +70,13 @@ int main(int argc, char **argv) {
             if (getmouse(&event) == OK) {
                 if (event.bstate & BUTTON1_CLICKED & (~BUTTON1_PRESSED)) {
                     mvwprintw(debug, 6, 1, "left mouse button clicked!");
-                    keypad(windows[current_window], FALSE);
+                    windows[current_window].set_keypad(FALSE);
                     if (wenclose(win, event.y, event.x)) {
                         current_window = 0;
                     } else if (wenclose(debug, event.y, event.x)) {
                         current_window = 1;
                     }
-                    keypad(windows[current_window], TRUE);
+                    windows[current_window].set_keypad(TRUE);
                 } else if ((event.bstate & BUTTON1_PRESSED) && !is_resizing) {
                     side = windows[current_window].get_side(event.x, event.y);
                     if ((is_resizing = (side != WindowSide::NONE))) {
@@ -128,7 +128,7 @@ int main(int argc, char **argv) {
                 mvwprintw(debug, 6, 1, "event.bstate = %d", event.bstate);
                 mvwprintw(debug, 7, 1, "event.bstate & BUTTON1_PRESSED = %d", event.bstate & BUTTON1_PRESSED);
                 mvwprintw(debug, 8, 1, "event.bstate & BUTTON1_RELEASED = %d", event.bstate & BUTTON1_RELEASED);
-                wrefresh(debug);
+                debug.refresh();
             }
             break;
         }
