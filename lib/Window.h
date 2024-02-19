@@ -9,6 +9,8 @@
 
 enum class WindowSide { LEFT, TOP, RIGHT, BOTTOM, NONE };
 
+enum class BorderState { NORMAL, BOLD };
+
 class Window {
     /*
 
@@ -30,16 +32,35 @@ private:
     Point p0_;
     Point p1_;
     std::string name_;
-    void print_border() const;
-    void print_content() const;
+    BorderState left_border_state_;
+    BorderState right_border_state_;
+    BorderState top_border_state_;
+    BorderState bottom_border_state_;
+    BorderState left_top_corner_state_;
+    BorderState left_bottom_corner_state_;
+    BorderState right_top_corner_state_;
+    BorderState right_bottom_corner_state_;
 
-    static inline int horizontal_border_width = 1;
-    static inline int vertical_border_width = 2;
+    static int get_attributes(BorderState& state);
+    void print_border();
+    void print_content();
+    void print_left_vertical_border();
+    void print_right_vertical_border();
+    void print_top_horizontal_border();
+    void print_bottom_horizontal_border();
+    void print_left_top_corner();
+    void print_left_bottom_corner();
+    void print_right_top_corner();
+    void print_right_bottom_corner();
+
+    static inline int horizontal_border_width   = 1;
+    static inline int vertical_border_width     = 2;
     static inline std::string horizontal_border = "=";
-    static inline std::string vertical_border = "||";
-    static inline std::string corner_border[] = {"[]"};
+    static inline std::string vertical_border   = "||";
+    static inline std::string corner_border[]   = {"[]"};
+
 public:
-    Window(int nlines, int ncols, int y0, int x0, std::string  name = "");
+    Window(int nlines, int ncols, int y0, int x0, std::string name = "");
     operator WINDOW*() const;
     void set_name(std::string const& name);
     WindowSide get_side(int x, int y);
@@ -49,14 +70,15 @@ public:
     [[nodiscard]] Point const& p1() const;
     int width() const;
     int height() const;
-    void print() const;
+    void print();
     void clear() const;
-    void refresh() const;
+    void refresh();
     void set_keypad(int value);
     void move_x0(int l);
     void move_y0(int l);
     void move_x1(int l);
     void move_y1(int l);
+    void stop_resize();
     ~Window();
 };
 

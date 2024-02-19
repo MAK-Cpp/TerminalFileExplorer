@@ -2,6 +2,9 @@
 #include <functional>
 #include <iostream>
 #include <string>
+#include <thread>
+#include <chrono>
+#include <atomic>
 
 #include "Directory.h"
 #include "RasterLine.h"
@@ -46,16 +49,13 @@ int main(int argc, char **argv) {
     noecho();
     mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, nullptr);
     printf("\033[?1003h\n");  // Makes the terminal report mouse movement events
-    bool while_state = true;
+    std::atomic_bool while_state = true;
     int ch;
     win.print();
     debug.print();
 
     int current_window = 0;
     windows[current_window].set_keypad(TRUE);
-
-    // mvwprintw(debug, 2, 1, "current_window window is %10s", windows[current_window].name().c_str());
-    // debug.refresh();
 
     bool is_resizing = false;
     WindowSide side  = WindowSide::NONE;
@@ -77,30 +77,28 @@ int main(int argc, char **argv) {
                         current_window = 1;
                     }
                     windows[current_window].set_keypad(TRUE);
-                } else if ((event.bstate & BUTTON1_PRESSED) && !is_resizing) {
-                    side = windows[current_window].get_side(event.x, event.y);
-                    if ((is_resizing = (side != WindowSide::NONE))) {
-                        prev_mouse_x = event.x;
-                        prev_mouse_y = event.y;
-                    }
-                } else if ((event.bstate & BUTTON1_RELEASED) && is_resizing) {
-                    is_resizing  = false;
-                    side         = WindowSide::NONE;
-                    prev_mouse_x = -1;
-                    prev_mouse_y = -1;
-                } else {
-                    if (!is_resizing) {
-                        debug.clear();
-                        debug.print();
+                } else if (event.bstate & BUTTON1_DOUBLE_CLICKED) {
+                    if (is_resizing) {
+                        is_resizing  = false;
+                        side         = WindowSide::NONE;
+                        prev_mouse_x = -1;
+                        prev_mouse_y = -1;
+                        windows[current_window].stop_resize();
                     } else {
+                        side = windows[current_window].get_side(event.x, event.y);
+                        if ((is_resizing = (side != WindowSide::NONE))) {
+                            prev_mouse_x = event.x;
+                            prev_mouse_y = event.y;
+                        }
+                    }
+                } else {
+                    if (is_resizing) {
                         switch (side) {
                         case WindowSide::LEFT: {
-                            mvwprintw(debug, 5, 1, "left");
                             windows[current_window].move_x0(event.x - prev_mouse_x);
                             break;
                         }
                         case WindowSide::TOP: {
-                            mvwprintw(debug, 5, 1, "top");
                             windows[current_window].move_y0(event.y - prev_mouse_y);
                             break;
                         }
@@ -141,70 +139,6 @@ int main(int argc, char **argv) {
         }
         }
     }
-    /*
-    while (while_state) {
-        ch = getch();
-        switch (ch) {
-        case ctrl('L'): {
-            fs::path path     = argv[0];
-            fs::path abs_path = fs::absolute(path).parent_path();
-            for (const auto &entry : fs::directory_iterator(abs_path)) {
-                wprintw(win, (entry.path().filename().string() + '\n').c_str());
-            }
-            wrefresh(win);
-            break;
-        }
-        case ctrl('D'): {
-            line.draw(win);
-            break;
-        }
-        case ctrl('F'): {
-            line.clear(win);
-            break;
-        }
-        case ctrl('C'): {
-            std::function<bool(Point)> yes_button = check_mouse_in_square(Point(38, LINES - 3), Point(44, LINES - 1));
-            mvwprintw(win, LINES - 3, 0, exit_message.c_str());
-            wrefresh(win);
-            while (true) {
-                ch = getch();
-                if (ch == KEY_MOUSE) {
-                    if (getmouse(&event) == OK) {
-                        mvwprintw(debug, 1, 0, "DEBUG:\nmouse last click position:\nx = %3d\ny = %3d", event.x,
-                                  event.y);
-                        wrefresh(debug);
-                        if ((event.bstate & BUTTON1_CLICKED) && yes_button(Point(event.x, event.y))) {
-                            break;
-                        }
-                    }
-                }
-            }
-            while_state = !yes_button(Point(event.x, event.y));
-            break;
-        }
-        case KEY_BACKSPACE:
-        case 127:
-        case '\b': {
-            // key_backspace
-            int x, y;
-            getyx(win, y, x);
-            if (x > 0) {
-                --x;
-            } else if (y > 0) {
-            }
-            wmove(win, y, x);
-            wdelch(win);
-            wrefresh(win);
-            break;
-        }
-        default: {
-            waddch(win, ch);
-            wrefresh(win);
-            break;
-        }
-        }
-    }
-    */
     printf("\033[?1003l\n");  // Disable mouse movement events, as l = low
     endwin();
     return 0;
