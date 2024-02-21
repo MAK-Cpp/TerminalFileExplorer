@@ -22,7 +22,15 @@ add_library(Window lib/Window.h src/Window.cpp)
 target_include_directories(Window PUBLIC lib)
 target_link_libraries(Window PUBLIC Point)
 
+add_library(Terminal lib/Terminal.h src/Terminal.cpp)
+target_include_directories(Terminal PUBLIC lib)
+target_link_libraries(Terminal PUBLIC Window)
+
+add_library(WindowsHandler lib/WindowsHandler.h src/WindowsHandler.cpp)
+target_include_directories(WindowsHandler PUBLIC lib)
+target_link_libraries(WindowsHandler PUBLIC Window Terminal)
+
 
 add_executable(${PROJECT_NAME} main.cpp)
 target_include_directories(${PROJECT_NAME} PUBLIC lib)
-target_link_libraries(${PROJECT_NAME} PUBLIC ${CURSES_LIBRARIES} Directory File RasterLine Point Window)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${CURSES_LIBRARIES} Directory File RasterLine Point Window Terminal WindowsHandler)

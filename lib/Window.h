@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <string>
+#include <functional>
 
 #include "Point.h"
 #include "ncurses.h"
@@ -26,7 +27,7 @@ class Window {
                                         (x1, y1)
 
      */
-private:
+protected:
     WINDOW* window_;
     WINDOW* sub_window_;
     Point p0_;
@@ -40,10 +41,12 @@ private:
     BorderState left_bottom_corner_state_;
     BorderState right_top_corner_state_;
     BorderState right_bottom_corner_state_;
+    bool is_resizable_;
+    bool is_chosen_;
 
-    static int get_attributes(BorderState& state);
+    static unsigned int get_attributes(BorderState& state);
     void print_border();
-    void print_content();
+    virtual void print_content();
     void print_left_vertical_border();
     void print_right_vertical_border();
     void print_top_horizontal_border();
@@ -60,7 +63,7 @@ private:
     static inline std::string corner_border[]   = {"[]"};
 
 public:
-    Window(int nlines, int ncols, int y0, int x0, std::string name = "");
+    Window(int nlines, int ncols, int y0, int x0, std::string name = "", bool is_resizable = false);
     operator WINDOW*() const;
     void set_name(std::string const& name);
     WindowSide get_side(int x, int y);
@@ -73,13 +76,14 @@ public:
     void print();
     void clear() const;
     void refresh();
-    void set_keypad(int value);
+    virtual void set_keypad(int value);
     void move_x0(int l);
     void move_y0(int l);
     void move_x1(int l);
     void move_y1(int l);
     void stop_resize();
-    ~Window();
+    virtual void key_capture(int ch);
+    virtual ~Window();
 };
 
 #endif  // TERMINALFILEEXPLORER_LIB_WINDOW_H_
